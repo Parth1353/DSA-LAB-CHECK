@@ -1,133 +1,110 @@
 #include <iostream>
-#include <algorithm> // For swap function
+#include <vector>
+
 using namespace std;
 
-#define SIZE 50
 
 class MaxPriorityQueue {
-    double heap[SIZE];
-    int size = -1;
-    
+private:
+    vector<int> heap;
+
     int parent(int i) {
-        return (i-1)/2;
+        return (i - 1) / 2;
     }
-    
+
     int leftChild(int i) {
-        return 2*i + 1;
+        return 2 * i + 1;
     }
-    
+
     int rightChild(int i) {
-        return 2*i + 2;
+        return 2 * i + 2;
     }
+
+    void swap(int i, int j) {
+        int temp = heap[i];
+        
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+
+    void heapify(int i) {
+        int left = leftChild(i);
+        int right = rightChild(i);
+        int largest = i;
+        if (left < heap.size() && heap[left] > heap[largest]) {
+            largest = left;
+        }
+        if (right < heap.size() && heap[right] > heap[largest]) {
+            largest = right;
+        }
+        if (largest != i) {
+            swap(i, largest);
+            heapify(largest);
+        }
+    }
+
 
 public:
-    void heapifyUP(int index);
-    void heapifyDOWN(int index);
-    void Insert(double x);
-    void Display();
-    double maximum();
-    double extractMax();
-};
-
-void MaxPriorityQueue::heapifyUP(int index) {
-    while(index > 0 && heap[parent(index)] < heap[index]) {
-        swap(heap[parent(index)], heap[index]);
-        index = parent(index);
+    void insert(int key) {
+        heap.push_back(key);
+        int index = heap.size() - 1;
+        while (index > 0 && heap[parent(index)] < heap[index]) {
+            swap(index, parent(index));
+            index = parent(index);
+        }
     }
-}
 
-void MaxPriorityQueue::heapifyDOWN(int index) {
-    int max = index;
 
-    if(leftChild(index) <= size && heap[leftChild(index)] > heap[max])
-        max = leftChild(index);
-    if(rightChild(index) <= size && heap[rightChild(index)] > heap[max])
-        max = rightChild(index);
-
-    if(max != index) {
-        swap(heap[index], heap[max]);
-        heapifyDOWN(max);
+    int extractMax() {
+        if (heap.empty()) {
+            return -1e9; 
+        }
+        int max = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapify(0);
+        return max;
     }
-}
 
-void MaxPriorityQueue::Insert(double x) {
-    heap[++size] = x;
-    heapifyUP(size);
-}
-
-void MaxPriorityQueue::Display() {
-    if(size == -1) {
-        cout << "Priority Queue is empty!" << endl;
-        return;
-    }
-    cout << "Max Priority Queue: ";
-    for(int i = 0; i <= size; i++) {
-        cout << heap[i] << " ";
-    }
-    cout << endl;
-}
-
-double MaxPriorityQueue::maximum() {
-    if(size == -1) {
-        cout << "Priority Queue is empty!" << endl;
-        return -1;
-    } else {
+    int peekMax() {
+        if (heap.empty()) {
+            return -1e9; 
+        }
         return heap[0];
     }
-}
 
-double MaxPriorityQueue::extractMax() {
-    if(size == -1) {
-        cout << "Max Priority Queue is empty!" << endl;
-        return -1;
+    bool isEmpty() {
+        return heap.empty();
     }
-    double max = heap[0];
-    heap[0] = heap[size--];
-    heapifyDOWN(0);
-    return max;
-}
+
+    int size() {
+        return heap.size();
+    }
+};
 
 int main() {
     MaxPriorityQueue pq;
-    double num;
-    int n, op;
-    string cont;
-    
-    while(true) {
-        cout << "Which operation do you want to perform?\n"
-             << "1. Traverse\n"
-             << "2. Insert\n"
-             << "3. Display maximum element\n"
-             << "4. Extract maximum element\n";
-        cin >> op;
+     while(true){
+        cout<<"Enter 1 to insert\nEnter 2 to get max value\nEnter 3 to remove max Priority element\nEnter 4 to get size"<<endl;
+        int n;
+        cin>>n;
 
-        switch(op) {
-            case 1:
-                pq.Display();
-                break;
-            case 2:
-                cout << "How many elements do you want to insert? : ";
-                cin >> n;
-                for(int i = 0; i < n; i++) {
-                    cout << "Enter an element to insert: ";
-                    cin >> num;
-                    pq.Insert(num);
-                }
-                break;
-            case 3:
-                cout << "Maximum element is: " << pq.maximum() << endl;
-                break;
-            case 4:
-                cout << "The element " << pq.extractMax() << " has been extracted from the Priority Queue" << endl;
-                break;
-        }
+        if(n==1){
+           cout<<"Enter element to inset"<<endl;
+           int a;
+           cin>>a;
+           pq.insert(a);
+        }else if(n==2){
+            cout<<"Max Priority element is : "<<pq.peekMax()<<endl;
 
-        cout << "Do you wish to continue? (YES/No) : ";
-        cin >> cont;
-        if(cont != "YES" && cont != "yes" && cont != "Yes") {
+        }else if(n==3){
+             pq.extractMax();
+             cout<<"Max priority element removed"<<endl;
+        }else if(n==4){
+           cout<<"Size of maxpriorityQueue is : "<<pq.size()<<endl;
+        }else{
             break;
         }
-    }
+     }
 
-    return 0;
 }
